@@ -94,7 +94,7 @@ export const recommendations = [
   },
 ];
 
-export const aiInsights = [
+export const aiInsights: Array<{ id: number; title: string; description: string; impact: "high" | "medium" | "low"; metric: string; metricLabel: string }> = [
   {
     id: 1,
     title: "Cloud Infrastructure Dominance",
