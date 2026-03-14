@@ -23,10 +23,13 @@ def read_statement(file_bytes: bytes) -> pd.DataFrame:
 
     # Normalize text and parse values.
     df["vendor"] = df["vendor"].astype(str).str.strip()
+    # Accept common currency formats from bank exports (e.g. $, Rs, INR, and ₹).
     df["amount"] = (
         df["amount"]
         .astype(str)
-        .str.replace(r"[$,]", "", regex=True)
+        .str.replace(r"[$,₹]", "", regex=True)
+        .str.replace(r"(?i)\b(?:rs|inr)\b", "", regex=True)
+        .str.replace(r"[^0-9.\-]", "", regex=True)
         .str.strip()
     )
     df["amount"] = pd.to_numeric(df["amount"], errors="coerce")
