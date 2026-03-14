@@ -58,10 +58,10 @@ const VendorTable = ({ vendors, highlightTop = 3 }: VendorTableProps) => {
                   </span>
                 </TableCell>
                 <TableCell className="text-right text-foreground">
-                  ${vendor.spend.toLocaleString()}
+                  Rs {vendor.spend.toLocaleString("en-IN")}
                 </TableCell>
                 <TableCell className="text-right font-medium text-foreground">
-                  {vendor.emissions.toFixed(1)}
+                  {vendor.emissions < 1 ? vendor.emissions.toFixed(3) : vendor.emissions.toFixed(1)}
                 </TableCell>
                 <TableCell className="text-right text-muted-foreground">
                   {vendor.intensityScore.toFixed(2)}

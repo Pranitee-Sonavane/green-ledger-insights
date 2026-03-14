@@ -1,0 +1,3 @@
+category,activity_key,unit,factor_kg_per_unit,is_active,source
+Transportation,distance_km,kgCO2e/passenger-km,0.11428,true,DEFRA-style passenger flight proxy
+Logistics,freight_ton_km,kgCO2e/ton-km,0.006,true,Freight road transport proxy

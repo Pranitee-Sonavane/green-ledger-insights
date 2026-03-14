@@ -1,9 +1,17 @@
 import { motion } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
 import InsightCard from "@/components/InsightCard";
-import { aiInsights } from "@/data/mockData";
 import { Brain } from "lucide-react";
+import { getAIInsights } from "@/lib/api";
 
 const AIInsights = () => {
+  const insightsQuery = useQuery({
+    queryKey: ["ai-insights"],
+    queryFn: () => getAIInsights(6),
+  });
+
+  const aiInsights = insightsQuery.data ?? [];
+
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
       <div className="flex items-center gap-3">
@@ -15,6 +23,18 @@ const AIInsights = () => {
           <p className="text-sm text-muted-foreground">Smart recommendations powered by AI analysis</p>
         </div>
       </div>
+
+      {insightsQuery.isLoading && (
+        <div className="rounded-md border border-border/50 bg-muted/40 p-3 text-sm text-muted-foreground">
+          Loading AI insights...
+        </div>
+      )}
+
+      {insightsQuery.error && (
+        <div className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
+          {insightsQuery.error instanceof Error ? insightsQuery.error.message : "Failed to load AI insights"}
+        </div>
+      )}
 
       <div className="space-y-4">
         {aiInsights.map((insight, i) => (
