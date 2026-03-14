@@ -1,5 +1,5 @@
 import { Search, Bell, ChevronDown, LogOut } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -14,13 +14,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/context/AuthContext";
-import { useToast } from "@/hooks/use-toast";
 import ThemeToggle from "@/components/ThemeToggle";
 
 const TopNavbar = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  const { toast } = useToast();
 
   const [notifications, setNotifications] = useState<{
     id: number;
@@ -32,47 +30,6 @@ const TopNavbar = () => {
   const [notificationMenuOpen, setNotificationMenuOpen] = useState(false);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
-
-  const simulateNotification = useCallback(() => {
-    const sampleNotifications = [
-      {
-        title: "New Vendor Score",
-        message: "Eco-score updated for Vendor A (82% → 86%).",
-      },
-      {
-        title: "Carbon Alert",
-        message: "Emissions threshold exceeded for Q2 shipments.",
-      },
-      {
-        title: "Report Ready",
-        message: "Your monthly sustainability report is available.",
-      },
-      {
-        title: "Policy Update",
-        message: "Updated sourcing policy requires vendor review.",
-      },
-    ];
-
-    const random = sampleNotifications[Math.floor(Math.random() * sampleNotifications.length)];
-    const newNotification = {
-      id: Date.now(),
-      title: random.title,
-      message: random.message,
-      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-      read: false,
-    };
-
-    setNotifications((prev) => [newNotification, ...prev].slice(0, 5));
-    toast({
-      title: "New notification",
-      description: random.message,
-    });
-  }, [toast]);
-
-  useEffect(() => {
-    const timer = window.setInterval(simulateNotification, 25000);
-    return () => window.clearInterval(timer);
-  }, [simulateNotification]);
 
   const handleLogout = () => {
     logout();

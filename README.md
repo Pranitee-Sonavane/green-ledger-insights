@@ -7,7 +7,6 @@ React + Vite frontend with a FastAPI backend for CSV-based carbon insights.
 - Node.js 18+
 - npm
 - Python 3.10+
-- `uv` package manager for Python
 
 ## Local Setup
 
@@ -23,7 +22,7 @@ npm install
 
 ```sh
 cd backend
-uv sync
+python -m pip install -r requirements.txt
 cd ..
 ```
 
@@ -75,7 +74,7 @@ npm run backend:dev
 
 ```sh
 cd backend
-uv sync
+python -m pip install -r requirements.txt
 ```
 
 4. Reload frontend after backend is up.

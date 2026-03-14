@@ -11,6 +11,13 @@ def _latest_batch_id(db: Session) -> int | None:
     return db.query(func.max(UploadBatch.id)).scalar()
 
 
+def clear_upload_data(db: Session) -> None:
+    """Remove all uploaded transaction batches so analytics reset to empty state."""
+    db.query(Transaction).delete(synchronize_session=False)
+    db.query(UploadBatch).delete(synchronize_session=False)
+    db.commit()
+
+
 def upsert_carbon_factors(db: Session, factors: list[dict]) -> int:
     upserted = 0
     for row in factors:

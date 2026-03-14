@@ -18,6 +18,10 @@ const COLORS = [
   "hsl(168, 76%, 36%)",
 ];
 
+const EMPTY_CATEGORY_DATA = [{ name: "No data", value: 0 }];
+const EMPTY_VENDOR_DATA = [{ name: "No data", emissions: 0 }];
+const EMPTY_MONTHLY_DATA = [{ month: "No data", emissions: 0 }];
+
 const Dashboard = () => {
   const overviewQuery = useQuery({ queryKey: ["dashboard-overview"], queryFn: getOverview });
   const categoryQuery = useQuery({ queryKey: ["dashboard-categories"], queryFn: getEmissionsByCategory });
@@ -29,9 +33,10 @@ const Dashboard = () => {
   const error = overviewQuery.error || categoryQuery.error || topVendorsQuery.error || monthlyTrendQuery.error;
 
   const overview = overviewQuery.data;
-  const emissionsByCategory = categoryQuery.data ?? [];
-  const topVendorsByEmissions = topVendorsQuery.data ?? [];
-  const monthlyEmissions = monthlyTrendQuery.data ?? [];
+  const emissionsByCategory = (categoryQuery.data?.length ? categoryQuery.data : EMPTY_CATEGORY_DATA);
+  const topVendorsByEmissions = (topVendorsQuery.data?.length ? topVendorsQuery.data : EMPTY_VENDOR_DATA);
+  const monthlyEmissions = (monthlyTrendQuery.data?.length ? monthlyTrendQuery.data : EMPTY_MONTHLY_DATA);
+  const dashboardInsights = insightsQuery.data ?? [];
 
   const sustainabilityScore = Math.max(0, Math.min(100, Math.round(100 - (overview?.total_emissions_kg ?? 0) / 10)));
 
@@ -187,8 +192,13 @@ const Dashboard = () => {
         >
           AI-Powered Insights
         </motion.h2>
+        {dashboardInsights.length === 0 && (
+          <div className="rounded-md border border-border/50 bg-muted/20 p-4 text-sm text-muted-foreground mb-3">
+            No AI insights yet. Upload transaction data to generate real analysis. Current analyzed emissions: 0.000 kg CO2.
+          </div>
+        )}
         <div className="space-y-3">
-          {(insightsQuery.data ?? []).slice(0, 3).map((insight, i) => (
+          {dashboardInsights.slice(0, 3).map((insight, i) => (
             <motion.div key={insight.id} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1 }}>
               <InsightCard {...insight} />
             </motion.div>

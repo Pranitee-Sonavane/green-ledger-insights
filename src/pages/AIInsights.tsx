@@ -36,6 +36,12 @@ const AIInsights = () => {
         </div>
       )}
 
+      {aiInsights.length === 0 && (
+        <div className="rounded-md border border-border/50 bg-muted/20 p-4 text-sm text-muted-foreground">
+          No insights available yet. Upload a CSV to analyze real emissions data. Current analyzed emissions: 0.000 kg CO2.
+        </div>
+      )}
+
       <div className="space-y-4">
         {aiInsights.map((insight, i) => (
           <motion.div

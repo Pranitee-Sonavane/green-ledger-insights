@@ -17,6 +17,9 @@ const Recommendations = () => {
     current: r.currentEmissions,
     recommended: r.estimatedEmissions,
   }));
+  const displayedComparisonData = comparisonData.length > 0
+    ? comparisonData
+    : [{ name: "No data", current: 0, recommended: 0 }];
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
@@ -37,6 +40,12 @@ const Recommendations = () => {
         </div>
       )}
 
+      {recommendations.length === 0 && (
+        <div className="rounded-md border border-border/50 bg-muted/20 p-4 text-sm text-muted-foreground">
+          No recommendations yet. Current and recommended emissions are both 0.000 kg until a CSV is uploaded.
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {recommendations.map((r, i) => (
           <motion.div key={r.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
@@ -48,7 +57,7 @@ const Recommendations = () => {
       <ChartCard title="Emissions Comparison: Current vs. Recommended">
         <div className="h-72">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={comparisonData}>
+            <BarChart data={displayedComparisonData}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis dataKey="name" tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
               <YAxis tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />

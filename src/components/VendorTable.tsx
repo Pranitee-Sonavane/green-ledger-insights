@@ -22,6 +22,16 @@ interface VendorTableProps {
 }
 
 const VendorTable = ({ vendors, highlightTop = 3 }: VendorTableProps) => {
+  if (vendors.length === 0) {
+    return (
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
+        <div className="rounded-lg border border-border/50 bg-muted/20 p-8 text-center text-sm text-muted-foreground">
+          No vendor data yet. Upload a CSV to populate the leaderboard. Current emissions: 0.000 kg CO2.
+        </div>
+      </motion.div>
+    );
+  }
+
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
       <div className="rounded-lg border border-border/50 overflow-hidden">

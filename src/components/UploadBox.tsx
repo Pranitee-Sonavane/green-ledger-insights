@@ -70,13 +70,13 @@ const UploadBox = ({ onUpload }: UploadBoxProps) => {
                   Drag & drop your CSV file here
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Supports CSV, XLSX up to 10MB
+                  Supports CSV uploads up to 10MB
                 </p>
               </div>
             )}
 
             <label>
-              <input type="file" className="hidden" accept=".csv,.xlsx" onChange={handleFileInput} />
+              <input type="file" className="hidden" accept=".csv" onChange={handleFileInput} />
               <Button variant="outline" size="sm" className="cursor-pointer" asChild>
                 <span>Browse Files</span>
               </Button>
