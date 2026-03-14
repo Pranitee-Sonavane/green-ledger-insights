@@ -34,7 +34,9 @@ const LoginPage = () => {
       if (success) {
         navigate("/dashboard");
       } else {
-        setError("Invalid email or password. Demo credentials: admin@greenledger.com / admin123");
+        setError(
+          "Invalid email or password. Demo credentials: admin@greenledger.com/admin123 or manager@greenledger.com/manager123"
+        );
       }
     } catch (err) {
       setError("An error occurred during login");
@@ -120,6 +122,9 @@ const LoginPage = () => {
               <div className="bg-muted/50 rounded-lg p-3 space-y-1 text-xs">
                 <p><span className="font-medium">Email:</span> admin@greenledger.com</p>
                 <p><span className="font-medium">Password:</span> admin123</p>
+                <p className="pt-2 font-semibold">Additional account</p>
+                <p><span className="font-medium">Email:</span> manager@greenledger.com</p>
+                <p><span className="font-medium">Password:</span> manager123</p>
               </div>
             </div>
           </CardContent>

@@ -24,14 +24,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = useCallback(async (email: string, password: string): Promise<boolean> => {
     // Simple validation - in production, this would call a backend API
-    const validCredentials =
-      email === "admin@greenledger.com" && password === "admin123";
+    const isAdminUser = email === "admin@greenledger.com" && password === "admin123";
+    const isManagerUser = email === "manager@greenledger.com" && password === "manager123";
+    const validCredentials = isAdminUser || isManagerUser;
 
     if (validCredentials) {
       const userData = { email };
       setUser(userData);
       setIsAuthenticated(true);
-      localStorage.setItem("authToken", "admin-token");
+      const token = isAdminUser ? "admin-token" : "manager-token";
+      localStorage.setItem("authToken", token);
       localStorage.setItem("user", JSON.stringify(userData));
       return true;
     }
