@@ -150,10 +150,12 @@ const TopNavbar = () => {
                   {userInitials}
                 </AvatarFallback>
               </Avatar>
-              <div className="hidden md:block">
-                <p className="text-sm font-medium text-foreground leading-none">Green Ledger</p>
-                <p className="text-xs text-muted-foreground">{userEmail}</p>
-              </div>
+              <div className="flex items-center gap-2">
+ 
+  <span className="text-2xl font-extrabold tracking-wide font-serif text-primary">
+    Green Ledger
+  </span>
+</div>
               <ChevronDown className="h-3.5 w-3.5 text-muted-foreground hidden md:block" />
             </div>
           </DropdownMenuTrigger>

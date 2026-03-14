@@ -4,6 +4,7 @@ import UploadBox from "@/components/UploadBox";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Zap } from "lucide-react";
+import Papa from "papaparse";
 
 type PreviewTransaction = {
   date: string;
@@ -27,10 +28,105 @@ const UploadPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [uploadResult, setUploadResult] = useState<UploadResponse | null>(null);
 
+  const inferCategory = (vendor: string) => {
+    const v = vendor.toLowerCase();
+    if (v.includes("aws") || v.includes("google") || v.includes("dell") || v.includes("apple")) return "Cloud / IT";
+    if (v.includes("airlines") || v.includes("delta") || v.includes("united")) return "Air Travel";
+    if (v.includes("fedex") || v.includes("ups")) return "Freight";
+    if (v.includes("staples") || v.includes("office depot")) return "Office Supplies";
+    return "Other";
+  };
+
+  const calculateEmissions = (row: any) => {
+    // CSV fields: amount, distance_km, passenger_count, freight_ton_km
+    const amount = Number(row.amount);
+    const distance = Number(row.distance_km);
+    const passengers = Number(row.passenger_count);
+    const freight = Number(row.freight_ton_km);
+
+    if (!Number.isNaN(freight) && freight > 0) {
+      return freight * 0.0006 * 1000; // ton-km to kg by surrogate factor
+    }
+
+    if (!Number.isNaN(distance) && !Number.isNaN(passengers) && passengers > 0) {
+      return distance * passengers * 0.17; // airline average kg/passenger-km
+    }
+
+    if (!Number.isNaN(amount) && amount > 0) {
+      return amount * 0.003; // finance-based emission proxy
+    }
+
+    return 0;
+  };
+
   const handleUpload = async (file: File) => {
     setError(null);
     setIsUploading(true);
 
+    const fileName = file.name.toLowerCase();
+    if (fileName.endsWith(".csv")) {
+      try {
+        const text = await file.text();
+        const parsed = Papa.parse(text, { header: true, skipEmptyLines: true });
+        const invalidRows: number[] = [];
+        const validRows: PreviewTransaction[] = [];
+
+        const rows = parsed.data as Record<string, string>[];
+
+        rows.forEach((row, idx) => {
+          const date = (row.date || "").trim();
+          const vendor = (row.vendor || "").trim();
+          const amount = Number((row.amount || "").toString().replace(/[^0-9.\-]/g, ""));
+
+          if (!date || !vendor || Number.isNaN(amount)) {
+            invalidRows.push(idx + 2); // +2 includes header line
+            return;
+          }
+
+          const category = inferCategory(vendor);
+          const emissions = calculateEmissions(row);
+
+          validRows.push({
+            date,
+            vendor,
+            category,
+            amount,
+            emissions_kg: Number(emissions.toFixed(3)),
+          });
+        });
+
+        if (validRows.length === 0) {
+          throw new Error("No valid rows found in CSV. Please check header and numeric fields.");
+        }
+
+        const totalEmissions = validRows.reduce((acc, row) => acc + row.emissions_kg, 0);
+
+        setUploadResult({
+          batch_id: Date.now(),
+          filename: file.name,
+          rows_processed: validRows.length,
+          total_emissions_kg: Number(totalEmissions.toFixed(3)),
+          preview: validRows.slice(0, 10),
+        });
+
+        setUploaded(true);
+
+        if (invalidRows.length > 0) {
+          setError(`Skipped ${invalidRows.length} invalid row(s): ${invalidRows.join(", ")}.`);
+        }
+      } catch (err) {
+        const message = err instanceof Error ? err.message : "CSV parsing failed";
+        setError(message);
+        setUploaded(false);
+        setUploadResult(null);
+      } finally {
+        setIsUploading(false);
+      }
+
+      return;
+    }
+
+    // Fallback for non-CSV (existing backend API path)
     try {
       const formData = new FormData();
       formData.append("file", file);

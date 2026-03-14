@@ -45,8 +45,14 @@ const LandingPage = () => {
           </div>
           <div className="flex items-center gap-3">
             <ThemeToggle />
-            <Button variant="ghost" size="sm" onClick={() => navigate("/login")}>Login</Button>
-            <Button size="sm" onClick={() => navigate("/login")}>Get Started</Button>
+<Button
+  variant="ghost"
+  size="sm"
+  onClick={() => navigate("/login")}
+  className="text-lg font-semibold border border-primary px-5 py-2"
+>
+  Login
+</Button>            <Button size="sm" onClick={() => navigate("/login")}>Get Started</Button>
           </div>
         </div>
       </nav>
@@ -75,9 +81,14 @@ const LandingPage = () => {
               <Button size="lg" className="gap-2 text-base" onClick={() => navigate("/login")}>
                 Get Started <ArrowRight className="h-4 w-4" />
               </Button>
-              <Button variant="outline" size="lg" className="text-base" onClick={() => navigate("/login")}>
-                View Demo
-              </Button>
+              <Button
+  variant="outline"
+  size="lg"
+  className="text-lg font-semibold border-2 border-primary px-6 py-2"
+  onClick={() => navigate("/login")}
+>
+  View Demo
+</Button>
             </div>
           </motion.div>
 
