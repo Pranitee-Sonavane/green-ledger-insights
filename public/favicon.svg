@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- Rounded background -->
+  <rect width="64" height="64" rx="12" fill="#10b981"/>
+  
+  <!-- Leaf icon -->
+  <g transform="translate(32, 32)">
+    <path d="M -4 -8 Q -6 0 -4 8 Q 0 12 4 8 Q 6 0 4 -8 Q 0 -10 -4 -8 Z" fill="#ffffff" stroke="#ffffff" stroke-width="0.5" stroke-linejoin="round"/>
+    <!-- Leaf vein -->
+    <line x1="0" y1="-8" x2="0" y2="8" stroke="#10b981" stroke-width="1"/>
+  </g>
+</svg>
