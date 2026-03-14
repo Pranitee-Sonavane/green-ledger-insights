@@ -1,0 +1,11 @@
+{
+  "id": 1,
+  "companyName": "gayatri corp",
+  "industry": "Technology",
+  "email": "admin@acmecorp.com",
+  "notifications": {
+    "emailReports": true,
+    "emissionAlerts": true,
+    "vendorUpdates": true
+  }
+}
