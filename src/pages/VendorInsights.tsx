@@ -1,19 +1,26 @@
 import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
 import VendorTable from "@/components/VendorTable";
-import { vendors } from "@/data/mockData";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
-const categories = ["All", "Cloud Services", "Transportation", "Hardware", "Logistics", "Office Supplies"];
+import { getVendors } from "@/lib/api";
 
 const VendorInsights = () => {
   const [category, setCategory] = useState("All");
+  const vendorsQuery = useQuery({ queryKey: ["vendors-summary"], queryFn: getVendors });
+
+  const categories = useMemo(() => {
+    const vendorRows = vendorsQuery.data ?? [];
+    const dynamic = Array.from(new Set(vendorRows.map((v) => v.category))).sort();
+    return ["All", ...dynamic];
+  }, [vendorsQuery.data]);
 
   const filtered = useMemo(() => {
-    let result = [...vendors].sort((a, b) => b.emissions - a.emissions);
+    const base = vendorsQuery.data ?? [];
+    let result = [...base].sort((a, b) => b.emissions - a.emissions);
     if (category !== "All") result = result.filter((v) => v.category === category);
     return result;
-  }, [category]);
+  }, [category, vendorsQuery.data]);
 
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
@@ -33,6 +40,18 @@ const VendorInsights = () => {
           </SelectContent>
         </Select>
       </div>
+
+      {vendorsQuery.isLoading && (
+        <div className="rounded-md border border-border/50 bg-muted/40 p-3 text-sm text-muted-foreground">
+          Loading vendor data...
+        </div>
+      )}
+
+      {vendorsQuery.error && (
+        <div className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
+          {vendorsQuery.error instanceof Error ? vendorsQuery.error.message : "Failed to load vendors"}
+        </div>
+      )}
 
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
         <VendorTable vendors={filtered} />

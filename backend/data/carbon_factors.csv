@@ -1,0 +1,7 @@
+category,region,year,unit,factor_kg_per_inr,source,is_active
+Cloud Services,IN,2025,kgCO2e/INR,0.0005,Category spend proxy factors (India-adjusted),true
+Transportation,IN,2025,kgCO2e/INR,0.0064,Category spend proxy factors (India-adjusted),true
+Logistics,IN,2025,kgCO2e/INR,0.0041,Category spend proxy factors (India-adjusted),true
+Hardware,IN,2025,kgCO2e/INR,0.0033,Category spend proxy factors (India-adjusted),true
+Office Supplies,IN,2025,kgCO2e/INR,0.0012,Category spend proxy factors (India-adjusted),true
+Other,IN,2025,kgCO2e/INR,0.0025,Category spend proxy factors (India-adjusted),true

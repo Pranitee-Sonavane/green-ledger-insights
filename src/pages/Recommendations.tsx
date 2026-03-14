@@ -1,22 +1,41 @@
 import { motion } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
 import RecommendationCard from "@/components/RecommendationCard";
 import ChartCard from "@/components/ChartCard";
-import { recommendations } from "@/data/mockData";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
-
-const comparisonData = recommendations.map((r) => ({
-  name: r.currentVendor,
-  current: r.currentEmissions,
-  recommended: r.estimatedEmissions,
-}));
+import { getRecommendations } from "@/lib/api";
 
 const Recommendations = () => {
+  const recommendationsQuery = useQuery({
+    queryKey: ["recommendations"],
+    queryFn: () => getRecommendations(8),
+  });
+
+  const recommendations = recommendationsQuery.data ?? [];
+  const comparisonData = recommendations.map((r) => ({
+    name: r.currentVendor,
+    current: r.currentEmissions,
+    recommended: r.estimatedEmissions,
+  }));
+
   return (
     <div className="space-y-6 max-w-6xl mx-auto">
       <div>
         <h1 className="text-2xl font-bold text-foreground">Sustainable Vendor Alternatives</h1>
         <p className="text-sm text-muted-foreground mt-1">Discover greener options to reduce your carbon footprint</p>
       </div>
+
+      {recommendationsQuery.isLoading && (
+        <div className="rounded-md border border-border/50 bg-muted/40 p-3 text-sm text-muted-foreground">
+          Loading recommendations...
+        </div>
+      )}
+
+      {recommendationsQuery.error && (
+        <div className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
+          {recommendationsQuery.error instanceof Error ? recommendationsQuery.error.message : "Failed to load recommendations"}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {recommendations.map((r, i) => (

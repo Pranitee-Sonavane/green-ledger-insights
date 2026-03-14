@@ -1,7 +1,9 @@
 import { Search, Bell, ChevronDown, LogOut } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import {
@@ -12,11 +14,65 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 import ThemeToggle from "@/components/ThemeToggle";
 
 const TopNavbar = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const { toast } = useToast();
+
+  const [notifications, setNotifications] = useState<{
+    id: number;
+    title: string;
+    message: string;
+    time: string;
+    read: boolean;
+  }[]>([]);
+  const [notificationMenuOpen, setNotificationMenuOpen] = useState(false);
+
+  const unreadCount = notifications.filter((n) => !n.read).length;
+
+  const simulateNotification = useCallback(() => {
+    const sampleNotifications = [
+      {
+        title: "New Vendor Score",
+        message: "Eco-score updated for Vendor A (82% → 86%).",
+      },
+      {
+        title: "Carbon Alert",
+        message: "Emissions threshold exceeded for Q2 shipments.",
+      },
+      {
+        title: "Report Ready",
+        message: "Your monthly sustainability report is available.",
+      },
+      {
+        title: "Policy Update",
+        message: "Updated sourcing policy requires vendor review.",
+      },
+    ];
+
+    const random = sampleNotifications[Math.floor(Math.random() * sampleNotifications.length)];
+    const newNotification = {
+      id: Date.now(),
+      title: random.title,
+      message: random.message,
+      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      read: false,
+    };
+
+    setNotifications((prev) => [newNotification, ...prev].slice(0, 5));
+    toast({
+      title: "New notification",
+      description: random.message,
+    });
+  }, [toast]);
+
+  useEffect(() => {
+    const timer = window.setInterval(simulateNotification, 25000);
+    return () => window.clearInterval(timer);
+  }, [simulateNotification]);
 
   const handleLogout = () => {
     logout();
@@ -47,10 +103,44 @@ const TopNavbar = () => {
 
       <div className="flex items-center gap-3">
         <ThemeToggle />
-        <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-foreground">
-          <Bell className="h-4 w-4" />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-primary" />
-        </Button>
+        <DropdownMenu open={notificationMenuOpen} onOpenChange={(open) => {
+          setNotificationMenuOpen(open);
+          if (open) {
+            setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+          }
+        }}>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-foreground">
+              <Bell className="h-4 w-4" />
+              {unreadCount > 0 ? (
+                <Badge className="absolute -top-1 -right-1 rounded-full bg-destructive text-destructive-foreground px-1.5 py-0 text-[10px]">
+                  {unreadCount}
+                </Badge>
+              ) : (
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-primary" />
+              )}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent side="bottom" align="end" className="w-80">
+            <div className="px-3 py-2 text-sm font-medium">Notifications</div>
+            <DropdownMenuSeparator />
+            {notifications.length === 0 ? (
+              <div className="p-3 text-xs text-muted-foreground">No notifications yet.</div>
+            ) : (
+              notifications.map((item) => (
+                <div key={item.id} className="px-3 py-2 rounded-lg hover:bg-muted/60">
+                  <p className="text-xs font-semibold text-foreground">{item.title}</p>
+                  <p className="text-[11px] text-muted-foreground">{item.message}</p>
+                  <p className="text-[10px] text-muted-foreground mt-1">{item.time}</p>
+                </div>
+              ))
+            )}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => setNotifications([])}>
+              Clear all notifications
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

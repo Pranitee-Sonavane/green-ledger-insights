@@ -3,11 +3,12 @@ import {
   PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   LineChart, Line, ResponsiveContainer,
 } from "recharts";
+import { useQuery } from "@tanstack/react-query";
 import StatCard from "@/components/StatCard";
 import ChartCard from "@/components/ChartCard";
 import InsightCard from "@/components/InsightCard";
-import { emissionsByCategory, topVendorsByEmissions, monthlyEmissions, aiInsights } from "@/data/mockData";
 import { motion } from "framer-motion";
+import { getAIInsights, getEmissionsByCategory, getMonthlyTrend, getOverview, getTopVendors } from "@/lib/api";
 
 const COLORS = [
   "hsl(160, 84%, 29%)",
@@ -18,6 +19,22 @@ const COLORS = [
 ];
 
 const Dashboard = () => {
+  const overviewQuery = useQuery({ queryKey: ["dashboard-overview"], queryFn: getOverview });
+  const categoryQuery = useQuery({ queryKey: ["dashboard-categories"], queryFn: getEmissionsByCategory });
+  const topVendorsQuery = useQuery({ queryKey: ["dashboard-top-vendors"], queryFn: () => getTopVendors(10) });
+  const monthlyTrendQuery = useQuery({ queryKey: ["dashboard-monthly-trend"], queryFn: getMonthlyTrend });
+  const insightsQuery = useQuery({ queryKey: ["dashboard-insights"], queryFn: () => getAIInsights(3) });
+
+  const isLoading = overviewQuery.isLoading || categoryQuery.isLoading || topVendorsQuery.isLoading || monthlyTrendQuery.isLoading;
+  const error = overviewQuery.error || categoryQuery.error || topVendorsQuery.error || monthlyTrendQuery.error;
+
+  const overview = overviewQuery.data;
+  const emissionsByCategory = categoryQuery.data ?? [];
+  const topVendorsByEmissions = topVendorsQuery.data ?? [];
+  const monthlyEmissions = monthlyTrendQuery.data ?? [];
+
+  const sustainabilityScore = Math.max(0, Math.min(100, Math.round(100 - (overview?.total_emissions_kg ?? 0) / 10)));
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       <div>
@@ -25,12 +42,44 @@ const Dashboard = () => {
         <p className="text-sm text-muted-foreground mt-1">Track and analyze your company's carbon footprint</p>
       </div>
 
+      {isLoading && (
+        <div className="rounded-md border border-border/50 bg-muted/40 p-3 text-sm text-muted-foreground">
+          Loading dashboard data...
+        </div>
+      )}
+
+      {error && (
+        <div className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
+          {error instanceof Error ? error.message : "Failed to load dashboard data"}
+        </div>
+      )}
+
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard title="Total Carbon Emissions" value="195 kg" subtitle="CO₂ equivalent" icon={Factory} trend={{ value: 3.2, positive: false }} />
-        <StatCard title="Sustainability Score" value="78 / 100" subtitle="Above average" icon={Gauge} trend={{ value: 5, positive: true }} />
-        <StatCard title="Total Vendors" value="10" subtitle="Tracked vendors" icon={Building2} />
-        <StatCard title="Highest Category" value="Cloud" subtitle="240.7 kg CO₂" icon={Cloud} />
+        <StatCard
+          title="Total Carbon Emissions"
+          value={`${(overview?.total_emissions_kg ?? 0).toFixed(3)} kg`}
+          subtitle="CO2 equivalent"
+          icon={Factory}
+        />
+        <StatCard
+          title="Sustainability Score"
+          value={`${sustainabilityScore} / 100`}
+          subtitle="Auto-estimated"
+          icon={Gauge}
+        />
+        <StatCard
+          title="Total Vendors"
+          value={overview?.total_vendors ?? 0}
+          subtitle="Tracked vendors"
+          icon={Building2}
+        />
+        <StatCard
+          title="Highest Category"
+          value={overview?.top_category ?? "N/A"}
+          subtitle={`${(overview?.top_category_emissions_kg ?? 0).toFixed(3)} kg CO2`}
+          icon={Cloud}
+        />
       </div>
 
       {/* Charts */}
@@ -55,7 +104,7 @@ const Dashboard = () => {
                   ))}
                 </Pie>
                 <Tooltip
-                  formatter={(value: number) => [`${value.toFixed(1)} kg CO₂`, ""]}
+                  formatter={(value: number) => [`${value.toFixed(3)} kg CO2`, ""]}
                   contentStyle={{
                     backgroundColor: "hsl(var(--card))",
                     border: "1px solid hsl(var(--border))",
@@ -84,7 +133,7 @@ const Dashboard = () => {
                 <XAxis type="number" tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
                 <YAxis dataKey="name" type="category" tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} width={100} />
                 <Tooltip
-                  formatter={(value: number) => [`${value.toFixed(1)} kg CO₂`, "Emissions"]}
+                  formatter={(value: number) => [`${value.toFixed(3)} kg CO2`, "Emissions"]}
                   contentStyle={{
                     backgroundColor: "hsl(var(--card))",
                     border: "1px solid hsl(var(--border))",
@@ -107,7 +156,7 @@ const Dashboard = () => {
               <XAxis dataKey="month" tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
               <YAxis tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
               <Tooltip
-                formatter={(value: number) => [`${value} kg CO₂`, "Emissions"]}
+                formatter={(value: number) => [`${value} kg CO2`, "Emissions"]}
                 contentStyle={{
                   backgroundColor: "hsl(var(--card))",
                   border: "1px solid hsl(var(--border))",
@@ -139,7 +188,7 @@ const Dashboard = () => {
           AI-Powered Insights
         </motion.h2>
         <div className="space-y-3">
-          {aiInsights.slice(0, 3).map((insight, i) => (
+          {(insightsQuery.data ?? []).slice(0, 3).map((insight, i) => (
             <motion.div key={insight.id} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1 }}>
               <InsightCard {...insight} />
             </motion.div>
