@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/context/AuthContext";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const TopNavbar = () => {
   const navigate = useNavigate();
@@ -45,6 +46,7 @@ const TopNavbar = () => {
       </div>
 
       <div className="flex items-center gap-3">
+        <ThemeToggle />
         <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-foreground">
           <Bell className="h-4 w-4" />
           <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-primary" />

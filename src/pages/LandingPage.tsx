@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowRight, BarChart3, Building2, Brain, Leaf, Upload, LineChart, Github, Twitter, Linkedin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const features = [
   {
@@ -43,6 +44,7 @@ const LandingPage = () => {
             <span className="text-lg font-bold text-foreground">Green Ledger</span>
           </div>
           <div className="flex items-center gap-3">
+            <ThemeToggle />
             <Button variant="ghost" size="sm" onClick={() => navigate("/login")}>Login</Button>
             <Button size="sm" onClick={() => navigate("/login")}>Get Started</Button>
           </div>

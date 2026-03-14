@@ -7,6 +7,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/context/AuthContext";
 import { Leaf, AlertCircle } from "lucide-react";
 import { motion } from "framer-motion";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -44,6 +45,9 @@ const LoginPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-accent via-background to-background flex items-center justify-center px-4">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
