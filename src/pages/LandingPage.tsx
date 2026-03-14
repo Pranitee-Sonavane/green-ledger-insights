@@ -43,8 +43,8 @@ const LandingPage = () => {
             <span className="text-lg font-bold text-foreground">Green Ledger</span>
           </div>
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")}>Login</Button>
-            <Button size="sm" onClick={() => navigate("/dashboard")}>Get Started</Button>
+            <Button variant="ghost" size="sm" onClick={() => navigate("/login")}>Login</Button>
+            <Button size="sm" onClick={() => navigate("/login")}>Get Started</Button>
           </div>
         </div>
       </nav>
@@ -70,10 +70,10 @@ const LandingPage = () => {
               Turn financial transactions into actionable sustainability insights. Make data-driven decisions to lower emissions and meet ESG goals.
             </p>
             <div className="flex flex-wrap gap-3">
-              <Button size="lg" className="gap-2 text-base" onClick={() => navigate("/dashboard")}>
+              <Button size="lg" className="gap-2 text-base" onClick={() => navigate("/login")}>
                 Get Started <ArrowRight className="h-4 w-4" />
               </Button>
-              <Button variant="outline" size="lg" className="text-base" onClick={() => navigate("/dashboard")}>
+              <Button variant="outline" size="lg" className="text-base" onClick={() => navigate("/login")}>
                 View Demo
               </Button>
             </div>
